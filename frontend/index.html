@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+</head>
+<body>
+    <div id="chatbox"></div>
+    <input type="text" id="messageInput" placeholder="Enter your message" />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:8080/API/chater/chat?user_id=12&receiver_id=11");
+
+        socket.onopen = () => {
+            console.log("Connected to the server");
+        };
+
+        socket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            const chatbox = document.getElementById("chatbox");
+            chatbox.innerHTML += `<p><strong>${message.sender_id}:</strong> ${message.message}</p>`;
+        };
+
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = {
+                sender_id: "12",  // текущий пользователь
+                receiver_id: "11",  // получатель
+                message: messageInput.value
+            };
+            socket.send(JSON.stringify(message));
+            messageInput.value = ""; // очистить поле ввода
+        }
+    </script>
+</body>
+</html>
